@@ -1,0 +1,273 @@
+<%- include('header.ejs') %>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.0/chartjs-plugin-zoom.min.js" integrity="sha512-B6F98QATBNaDHSE7uANGo5h0mU6fhKCUD+SPAY7KZDxE8QgZw9rewDtNiu3mbbutYDWOKT3SPYD8qDBpG2QnEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<section>
+    <!-- User Sidebar  -->
+    <div class="navbar" id="navigation">
+        <ul class="center-nav">
+            <li><i class="fa-solid fa-house"></i><a href="/dashboard"> Dashboard </a></li>
+            <li><i class="fa-sharp fa-solid fa-chart-simple"></i><a href="/setup"> setup </a></li>
+        </ul>
+        <ul class="bottom-nav">
+            <hr>
+            <li><i class="fa-solid fa-gear"></i><a href="#"> Settings </a></li>
+            <li><i class="fa-solid fa-power-off"></i><a href="/" class="link">Log out</a></li>
+        </ul>
+    </div>
+
+    <!-- User Top Naviagation  -->
+
+    <div class="main-content">
+        <div class="main-top">
+            <div class="bars" id="menu">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <div class="dashboard">
+                  <h3> &nbsp;&nbsp; <i class="fa-solid fa-user"></i></h3>
+            </div>
+        </div>
+
+        <!-- User Dashboard  -->
+
+    
+
+        <!-- Device Activity -->
+
+        <div class="activity_setup">
+            <br>
+            <h1 style="color:rgb(0, 0, 0); text-align: center;">You are a new User!!!!</h1><br>
+            <h3 style="color:rgb(0, 0, 0); text-align: center;">Please setup your device</h3>
+            <br><br><br><br>
+            <form method="post" action="/setup" id="form">
+                <label for="username">HiveMQ cluster username:</label>
+                <input type="text" id="username" name="susername" required>
+                <label for="password">HiveMQ cluster password:</label>
+                <input type="password" id="password" name="spassword" required>
+                <label for="host">HiveMQ cluster host:</label>
+                <input type="text" id="host" name="shost" required>
+                <label for="port">HiveMQ cluster port:</label>
+                <input type="text" id="port" name="sport" required>
+                <label for="topic">HiveMQ credential topic:</label>
+                <input type="text" id="topic" name="stopic" required>
+                <button type="submit"> <a href="/success_setup"> setup </a></button>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+<!--***************************************device popup******************************************-->
+
+
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="title">Device Information</div>
+      <button data-close-button class="close-button">&times;</button>
+    </div>
+    <div class="modal-body">
+      <ul style="list-style: none;"><br>
+        <li>Device ID : 324J#JK43 </li><br>
+        <li>Device Status : Active</li><br>
+        <li>Battery Status : 99 %</li><br>
+        <li>Temperature : 30 °C </li><br>
+          <li>Humidity : 26 % </li>
+      </ul>
+    </div>
+  </div>
+  <div id="overlay"></div>
+
+<br><br><br>
+
+<script>
+
+/******************************* menu bar slide *************************************************/
+  
+
+const hamburger = document.getElementById('menu');
+const navigation = document.getElementById('navigation');
+hamburger.addEventListener('click',  () => {
+    navigation.classList.toggle('active')
+    console.log('clicked');
+})
+
+/******************************* timestamp ***************************************************/
+
+let d = new Date();
+let formatter = Intl.DateTimeFormat(
+"default",
+{
+    weekday: "short", 
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric"
+}
+);
+document.querySelector(".timestamp").innerHTML=formatter.format(d);
+
+/******************************* timestamp *************************************************/
+function initMap(){
+          //map options
+          var options={
+            zoom:11,
+            center:{lat:12.917398,lng:80.228177}
+          }
+          //new map
+          var map=new google.maps.Map(document.getElementById('map'), options);
+          
+          /*
+          // add marker
+
+          var marker=new google.maps.Marker({
+            position:{lat:12.917398,lng:80.228177},
+            map:map
+          });
+
+          var infoWindow=new google.maps.InfoWindow({
+            content:'<h1>Srushty Global solutions</h1>'
+          });
+
+          marker.addListener('click',function(){
+            infoWindow.open(map,marker)
+          });
+        */
+
+        addMarker({lat:12.917398,lng:80.228177});
+
+
+          function addMarker(coords){
+            var marker=new google.maps.Marker({
+              position:coords,
+              map:map
+            });
+          }        
+        }
+
+
+</script>
+
+<!-- ***********************************************mqtt show in list***********************************-->
+
+
+
+
+<!-- ******************************************************************************************************-->
+
+<!-- ***********************************************mqtt show in list***********************************-->
+
+<script>
+  const xValues = [1,2,3,4,5,6,7];
+  const yValues = [20,30,27,40,32,25,20];
+  
+  new Chart("myChart", {
+    type: "line",
+    data: {
+      labels: xValues,
+      datasets: [{
+        fill: false,
+        lineTension: 0,
+        backgroundColor: "rgb(255, 0, 0)",
+        borderColor: "rgb(0, 255, 255)",
+        data: yValues
+      }]
+    },
+    options: {
+      legend: {display: false},
+      scales: {
+        yAxes: [{ticks: {min: 0, max:100}}],
+      },
+      plugins:{
+        zoom:{
+          zoom:{
+            wheel:{
+              enabled:true
+            }
+          }
+        }
+      }
+    }
+  });
+  Chart.register(zoomPlugin);
+  </script>
+
+ <!-- ******************************************************************************************************-->
+ 
+ <!--**************************************popup device script **************************************************-->
+<script>
+
+
+const openModalButtons = document.querySelectorAll('[data-modal-target]')
+const closeModalButtons = document.querySelectorAll('[data-close-button]')
+const overlay = document.getElementById('overlay')
+
+openModalButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const modal = document.querySelector(button.dataset.modalTarget)
+    openModal(modal)
+  })
+})
+
+overlay.addEventListener('click', () => {
+  const modals = document.querySelectorAll('.modal.active')
+  modals.forEach(modal => {
+    closeModal(modal)
+  })
+})
+
+closeModalButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const modal = button.closest('.modal')
+    closeModal(modal)
+  })
+})
+
+function openModal(modal) {
+  if (modal == null) return
+  modal.classList.add('active')
+  overlay.classList.add('active')
+}
+
+function closeModal(modal) {
+  if (modal == null) return
+  modal.classList.remove('active')
+  overlay.classList.remove('active')
+}
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<%- include('footer.ejs') %>

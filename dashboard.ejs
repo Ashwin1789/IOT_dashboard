@@ -1,0 +1,286 @@
+<%- include('header.ejs') %>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.0/chartjs-plugin-zoom.min.js" integrity="sha512-B6F98QATBNaDHSE7uANGo5h0mU6fhKCUD+SPAY7KZDxE8QgZw9rewDtNiu3mbbutYDWOKT3SPYD8qDBpG2QnEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<section>
+    <!-- User Sidebar  -->
+    <div class="navbar" id="navigation">
+        <ul class="center-nav">
+            <li><i class="fa-solid fa-house"></i><a href="/dashboard"> Dashboard </a></li>
+            <li><i class="fa-sharp fa-solid fa-chart-simple"></i><a href="/setup"> setup </a></li>
+        </ul>
+        <ul class="bottom-nav">
+            <hr>
+            <li><i class="fa-solid fa-gear"></i><a href="#"> Settings </a></li>
+            <li><i class="fa-solid fa-power-off"></i><a href="/" class="link">Log out</a></li>
+        </ul>
+    </div>
+
+    <!-- User Top Naviagation  -->
+
+    <div class="main-content">
+        <div class="main-top">
+            <div class="bars" id="menu">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <div class="dashboard">
+                  <h3> <%=username%>&nbsp;&nbsp; <i class="fa-solid fa-user"></i></h3>
+            </div>
+        </div>
+
+        <!-- User Dashboard  -->
+
+        <div class="dashboard">
+            <h2 class="heading"> Dashboard </h2>
+            <div class="color-box">
+                <div class="box skyblue">
+                 <div id="map" style="height:350px; width:500px"> <!-- map --> </div>
+                </div>
+                <div class="box yellow">
+                  <br><br>
+                    
+                    <div class="floattemp" style="margin-left:60px; margin-top: 100px;">
+                      <h2>Temperature</h2><br>
+                      <h1 style="font-size: 80px;">30  °C</h1> 
+                      <br><br><br>
+                      <h2 class="timestamp" style="margin-left:100px"></h2>
+                    </div>
+                    <br>
+                    <div class="floathum" style="margin-left:-60px; margin-top:95px;"> 
+                      <h2 >Humidity </h2><br>
+                      <h1 style="font-size: 80px;">26 % </h1>
+                    </div>                    
+                  </div>
+                <br><br>
+                <div class="box purple">
+                    <h3 style="margin-top:20px; margin-left: 30px;"> Hourly Record <br><br> <div style=" overflow:scroll;width: 150px; height:210px; background-color: rgb(255, 255, 255); display: grid; place-items: center;"> <ul> &nbsp;<li>6:00 - 30°C</li>&nbsp;<li>7:00 - 27°C</li>&nbsp;<li>8:00 - 20°C</li>&nbsp;<li>9:00 - 38°C</li> &nbsp;<li>10:00 - 40°C</li> &nbsp; <li>11:00 - 30°C</li>&nbsp;<li>12:00 - 34°C</li>&nbsp; <li>13:00 - 37°C</li> &nbsp;<li>14:00 - 26°C</li>&nbsp;<li>15:00 - 40°C</li> &nbsp;<li>16:00 - 30°C</li>&nbsp; <li>17:00- 27°C</li> &nbsp;</ul> </div> </h3>
+
+                    <div class="hourrecord" style="height: 250px; width: 900px; background-color: rgb(255, 255, 255); display: grid; place-items: center; margin-top: 20px; margin-left: 50px;">Analyzed chart<canvas id="myChart" style="height: 120px; width: 500px;"></canvas></div>
+                   
+                </div>
+            </div>
+        </div>
+
+        <!-- Device Activity -->
+
+        <div class="activity">
+            <h2 class="heading"> Device Activity </h2>
+            <div class="activities">
+                <table>
+                    <thead>
+                        <tr>
+                            &nbsp;
+                            <th> Location  </th>
+                            <th> Temperature </th>
+                            <th> Humidity </th>
+                            <th> TimeStamp</th>
+                            <th> Status </th>
+                            <th> View </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td> Office</td>
+                            <td> 30 °C</td>
+                            <td> 26 %</td>
+                            <td class="timestamp"> </td>
+                            <td> Active </td>
+                            <td button data-modal-target="#modal" style="cursor: pointer;"> view </td>
+                        </tr>
+                      
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!--***************************************device popup******************************************-->
+
+
+  <div class="model" id="model">
+    <div class="modal-header">
+      <div class="title">Device Information</div>
+      <button data-close-button class="close-button">&times;</button>
+    </div>
+    <div class="modal-body">
+      <ul style="list-style: none;"><br>
+        <li>Device ID : 324J#JK43 </li><br>
+        <li>Device Status : Active</li><br>
+        <li>Battery Status : 99 %</li><br>
+        <li>Temperature : 30 °C </li><br>
+          <li>Humidity : 26 % </li>
+      </ul>
+    </div>
+  </div>
+  <div id="overlay"></div>
+
+<br><br><br>
+
+<script>
+
+/******************************* menu bar slide *************************************************/
+  
+
+const hamburger = document.getElementById('menu');
+const navigation = document.getElementById('navigation');
+hamburger.addEventListener('click',  () => {
+    navigation.classList.toggle('active')
+    console.log('clicked');
+})
+
+/******************************* timestamp ***************************************************/
+
+let d = new Date();
+let formatter = Intl.DateTimeFormat(
+"default",
+{
+    weekday: "short", 
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric"
+}
+);
+document.querySelector(".timestamp").innerHTML=formatter.format(d);
+
+/******************************* timestamp *************************************************/
+function initMap(){
+          //map options
+          var options={
+            zoom:11,
+            center:{lat:12.917398,lng:80.228177}
+          }
+          //new map
+          var map=new google.maps.Map(document.getElementById('map'), options);
+          
+          /*
+          // add marker
+
+          var marker=new google.maps.Marker({
+            position:{lat:12.917398,lng:80.228177},
+            map:map
+          });
+
+          var infoWindow=new google.maps.InfoWindow({
+            content:'<h1>Srushty Global solutions</h1>'
+          });
+
+          marker.addListener('click',function(){
+            infoWindow.open(map,marker)
+          });
+        */
+
+        addMarker({lat:12.917398,lng:80.228177});
+
+
+          function addMarker(coords){
+            var marker=new google.maps.Marker({
+              position:coords,
+              map:map
+            });
+          }        
+        }
+
+
+</script>
+
+<!-- ***********************************************mqtt show in list***********************************-->
+
+
+
+
+<!-- ******************************************************************************************************-->
+
+<!-- ***********************************************mqtt show in list***********************************-->
+
+<script>
+  const xValues = [1,2,3,4,5,6,7];
+  const yValues = [20,30,27,40,32,25,20];
+  
+  new Chart("myChart", {
+    type: "line",
+    data: {
+      labels: xValues,
+      datasets: [{
+        fill: false,
+        lineTension: 0,
+        backgroundColor: "rgb(255, 0, 0)",
+        borderColor: "rgb(0, 255, 255)",
+        data: yValues
+      }]
+    },
+    options: {
+      legend: {display: false},
+      scales: {
+        yAxes: [{ticks: {min: 0, max:100}}],
+      },
+      plugins:{
+        zoom:{
+          zoom:{
+            wheel:{
+              enabled:true
+            }
+          }
+        }
+      }
+    }
+  });
+  Chart.register(zoomPlugin);
+  </script>
+
+ <!-- ******************************************************************************************************-->
+ 
+ <!--**************************************popup device script **************************************************-->
+<script>
+
+
+const openModalButtons = document.querySelectorAll('[data-modal-target]')
+const closeModalButtons = document.querySelectorAll('[data-close-button]')
+const overlay = document.getElementById('overlay')
+
+openModalButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const modal = document.querySelector(button.dataset.modalTarget)
+    openModal(modal)
+  })
+})
+
+overlay.addEventListener('click', () => {
+  const modals = document.querySelectorAll('.modal.active')
+  modals.forEach(modal => {
+    closeModal(modal)
+  })
+})
+
+closeModalButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const modal = button.closest('.modal')
+    closeModal(modal)
+  })
+})
+
+function openModal(modal) {
+  if (modal == null) return
+  modal.classList.add('active')
+  overlay.classList.add('active')
+}
+
+function closeModal(modal) {
+  if (modal == null) return
+  modal.classList.remove('active')
+  overlay.classList.remove('active')
+}
+
+
+</script>
+
+ <!-- ******************************************************************************************************-->
+
+
+<%- include('footer.ejs') %>
